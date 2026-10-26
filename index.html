@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ubi Fui: your private location history</title>
+<meta name="description" content="Ubi Fui is an iPhone app that quietly records the places you stop and the trips between them, and keeps it all on your phone. No account, no servers, no tracking.">
+<link rel="canonical" href="https://ubifui.app/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ubi Fui">
+<meta property="og:url" content="https://ubifui.app/">
+<meta property="og:title" content="Ubi Fui: your private location history">
+<meta property="og:description" content="Where you’ve been, kept on your iPhone. Stops, trips, places and a heat map of your time, with nothing sent to us.">
+<meta property="og:image" content="https://ubifui.app/assets/share-preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ubi Fui's Timeline showing a day of stops and trips around London">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f3f5fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e183a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>
+  :root {
+    color-scheme: light dark;
+    --page: #f3f5fb;
+    --page-deep: #e6eaf6;
+    --card: #ffffff;
+    --ink: #121a3a;
+    --muted: #55607f;
+    --rule: rgba(34, 52, 120, 0.14);
+    --accent: #e0561f;
+    --navy: #0e183a;
+    --navy-2: #223478;
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0b1330;
+      --page-deep: #101a40;
+      --card: #16224d;
+      --ink: #eef1fb;
+      --muted: #a7b0cf;
+      --rule: rgba(167, 176, 207, 0.16);
+      --accent: #ff8a4c;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 18px/1.6 var(--sans); }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  img { max-width: 100%; display: block; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+  /* Heat-map glows on navy, like the app icon */
+  .heat {
+    color: #eef1fb;
+    background:
+      radial-gradient(420px 260px at 78% 92%, rgba(255, 120, 40, 0.42), transparent 70%),
+      radial-gradient(260px 180px at 12% 20%, rgba(255, 150, 60, 0.18), transparent 70%),
+      radial-gradient(300px 200px at 95% 15%, rgba(120, 140, 255, 0.18), transparent 70%),
+      linear-gradient(135deg, var(--navy), var(--navy-2));
+  }
+  .heat p a { color: #ffb184; }
+  .soft { background: var(--page-deep); }
+
+  header.top { padding: 18px 0; }
+  header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none;
+           font: 700 20px var(--display); }
+  .brand img { width: 32px; height: 32px; border-radius: 8px; }
+  nav a { color: inherit; opacity: 0.75; text-decoration: none; font-size: 15px; margin-left: 20px; }
+  nav a:hover, nav a[aria-current] { opacity: 1; }
+
+  .hero { padding-bottom: 72px; }
+  .hero .wrap.split { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 48px; align-items: center; padding-top: 40px; }
+  .hero-icon { width: 96px; height: 96px; border-radius: 22px;
+               box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); margin-bottom: 28px; }
+  h1 { font: 700 clamp(40px, 6vw, 64px)/1.05 var(--display); margin: 0 0 18px; letter-spacing: -0.02em; }
+  .lede { font-size: 21px; color: rgba(238, 241, 251, 0.82); margin: 0 0 28px; max-width: 32em; }
+  .badge { display: inline-flex; align-items: center; gap: 10px; background: #fff; color: var(--navy);
+           border-radius: 12px; padding: 12px 18px; font: 600 15px var(--sans); text-decoration: none; }
+  .badge svg { width: 18px; height: 18px; fill: currentColor; }
+  .badge-note { font-size: 14px; color: rgba(238, 241, 251, 0.7); margin: 12px 0 0; }
+
+  .phone { margin: 0 auto; width: min(290px, 100%); border-radius: 46px; padding: 9px;
+           background: #0a0c14; box-shadow: 0 30px 60px rgba(5, 10, 30, 0.45); }
+  .phone img { border-radius: 38px; width: 100%; height: auto; }
+
+  section { padding: 80px 0; }
+  .eyebrow { font: 600 13px var(--sans); letter-spacing: 0.12em; text-transform: uppercase;
+             color: var(--accent); margin: 0 0 10px; }
+  .heat .eyebrow { color: #ffb184; }
+  h2 { font: 700 clamp(28px, 4vw, 38px)/1.15 var(--display); margin: 0 0 16px; letter-spacing: -0.01em; }
+  .intro { color: var(--muted); max-width: 40em; margin: 0 0 40px; }
+  .heat .intro { color: rgba(238, 241, 251, 0.8); }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; counter-reset: step; }
+  .step { counter-increment: step; }
+  .step .phone { width: min(240px, 100%); margin: 0 0 24px; border-radius: 40px; padding: 8px; }
+  .step .phone img { border-radius: 33px; }
+  .step h3::before { content: counter(step); display: inline-grid; place-items: center; width: 30px; height: 30px;
+                     margin-right: 10px; border-radius: 50%; background: var(--accent); color: #fff;
+                     font: 600 15px var(--sans); vertical-align: 2px; }
+  h3 { font: 600 21px/1.3 var(--display); margin: 0 0 8px; }
+  .step p, .feature p { margin: 0; color: var(--muted); font-size: 17px; }
+
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feature { background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 24px; }
+  .feature svg { width: 28px; height: 28px; stroke: var(--accent); fill: none; stroke-width: 1.6;
+                 stroke-linecap: round; stroke-linejoin: round; margin-bottom: 14px; }
+
+  .trips .wrap { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 56px; align-items: center; }
+  .trips p { color: var(--muted); }
+  .trips ul { padding-left: 1.1em; color: var(--muted); }
+  .trips li { margin: 8px 0; }
+
+  .centred .wrap { max-width: 760px; text-align: center; }
+  .centred .intro { margin: 0 auto; }
+  .soon-icon { width: 72px; height: 72px; border-radius: 17px; margin: 0 auto 24px;
+               box-shadow: 0 8px 22px rgba(5, 10, 30, 0.3); }
+
+  footer { border-top: 1px solid var(--rule); padding: 32px 0 48px; font-size: 14px; color: var(--muted); }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+  footer nav a { color: var(--muted); margin: 0 0 0 20px; opacity: 1; }
+
+  @media (max-width: 820px) {
+    .hero { padding-bottom: 56px; }
+    .hero .wrap.split, .trips .wrap { grid-template-columns: 1fr; gap: 40px; padding-top: 16px; }
+    .steps, .features { grid-template-columns: 1fr; }
+    .step .phone { margin: 0 auto 24px; }
+    .features { gap: 14px; }
+    section { padding: 56px 0; }
+    nav a.optional { display: none; }
+    .trips .phone { order: 2; }
+  }
+  @media (min-width: 821px) and (max-width: 1000px) {
+    .features { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="heat hero">
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="assets/favicon.png" alt="">Ubi Fui</a>
+    <nav>
+      <a class="optional" href="#how">How it works</a>
+      <a class="optional" href="#features">Features</a>
+      <a href="support/">Support</a>
+      <a href="privacy/">Privacy</a>
+    </nav>
+  </div>
+</header>
+  <div class="wrap split">
+    <div>
+      <img class="hero-icon" src="assets/icon.png" alt="Ubi Fui app icon">
+      <h1>Where you’ve been, kept on your iPhone.</h1>
+      <p class="lede">Ubi Fui (Latin for “where I was”) quietly notices the places you stop, how long you stay and how you got there. Look back on any day, week or year without ever checking in, and without your location leaving your phone.</p>
+      <span class="badge">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.37 12.6c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.76 2.28-1.6 2.78-.41 6.9 1.15 9.16.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.77.74 2.98.72 1.23-.02 2.01-1.12 2.76-2.23.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.4-.92-2.42-3.66zM14.1 5.86c.63-.77 1.06-1.83.94-2.89-.91.04-2.01.61-2.67 1.37-.58.67-1.09 1.76-.95 2.8 1.01.08 2.05-.52 2.68-1.28z"/></svg>
+        Coming soon to the App Store
+      </span>
+      <p class="badge-note">For iPhone, with a companion app for Apple Watch.</p>
+    </div>
+    <div class="phone"><img src="assets/screen-timeline.jpg" alt="Ubi Fui's Timeline: a day of stops at home, a café and work, with the trips between them on a map of London" width="644" height="1400"></div>
+  </div>
+</div>
+
+<main>
+<section id="how">
+  <div class="wrap">
+    <p class="eyebrow">How it works</p>
+    <h2>Set it up once, then forget about it.</h2>
+    <p class="intro">Allow location access and get on with your day. Ubi Fui runs in the background and fills in your history as you go.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="phone"><img src="assets/screen-timeline.jpg" alt="The Timeline for one day" width="644" height="1400" loading="lazy"></div>
+        <h3>It notices your stops</h3>
+        <p>Stay somewhere for five minutes and it becomes a stop on your Timeline, with when you arrived and how long you stayed.</p>
+      </div>
+      <div class="step">
+        <div class="phone"><img src="assets/screen-heatmap.jpg" alt="A heat map of a month around London, with named places pinned" width="644" height="1400" loading="lazy"></div>
+        <h3>Your time, mapped</h3>
+        <p>The heat map shows where you really spend your time. Tap a hotspot to turn it into a place.</p>
+      </div>
+      <div class="step">
+        <div class="phone"><img src="assets/screen-place.jpg" alt="A place called Work, with its visits, total time and history" width="644" height="1400" loading="lazy"></div>
+        <h3>Name what matters</h3>
+        <p>Home, work, the gym, a favourite café. Every past and future visit is tagged, so you can see how often you go and how long you stay.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="soft">
+  <div class="wrap">
+    <p class="eyebrow">Features</p>
+    <h2>A diary that writes itself.</h2>
+    <p class="intro">Everything you need to answer “where was I?”, and nothing that sends your movements to anyone else.</p>
+    <div class="features">
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <h3>Timeline</h3>
+        <p>Every stop of your day in order, with the route between them on a map. Swipe between days and add notes to remember what a stop was.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/><path d="M11 8v3l2 1"/></svg>
+        <h3>Where was I?</h3>
+        <p>Pick any date and time and Ubi Fui tells you where you were, or that you were on the move nearby.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c2 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5.5C10 9.5 11 11 12 11c0-3 0-5.5 0-8z"/></svg>
+        <h3>Heat map</h3>
+        <p>See where you spend your time over a week, a month, a year or all time, and rank your hotspots.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2"/></svg>
+        <h3>Places</h3>
+        <p>Give places a name, an icon and a colour, and adjust their size on a map. Visits are tagged automatically.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="5" width="10" height="14" rx="3"/><path d="M9 5l.5-3h5l.5 3M9 19l.5 3h5l.5-3"/><path d="M12 9v3l1.5 1"/></svg>
+        <h3>Apple Watch</h3>
+        <p>See where you are and today’s stops on your wrist, tag the spot you’re standing in, or say which place a stop was.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="16" height="10" rx="2"/><path d="M21 11v2"/><path d="M11 9l-2 3h4l-2 3"/></svg>
+        <h3>Easy on your battery</h3>
+        <p>GPS switches off while you’re stopped and iOS wakes it when you move, so Ubi Fui can run all day. Settings shows exactly when GPS was on.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="trips">
+  <div class="wrap">
+    <div class="phone"><img src="assets/screen-trip.jpg" alt="A trip from Home to Café, set to Bus, with its route on a map" width="644" height="1400" loading="lazy"></div>
+    <div>
+      <p class="eyebrow">Trips</p>
+      <h2>Know how you got there.</h2>
+      <p>Between your stops, Ubi Fui records the trip: its route, how far and how long.</p>
+      <ul>
+        <li>With motion data, it tells walking, running, cycling and vehicle legs apart, and where you switched: walk, then train, then walk.</li>
+        <li>Pick the mode yourself: car, bus, train, tram, plane, boat and more. Split a leg or merge two.</li>
+        <li>What you choose is remembered, so the same journey next time is filled in for you.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="heat centred">
+  <div class="wrap">
+    <p class="eyebrow">Privacy</p>
+    <h2>Your history is yours.</h2>
+    <p class="intro">There are no accounts and no servers of ours. Your stops, trips and places stay on your iPhone, and if you turn on iCloud Backup, in your own iCloud. You can export everything or delete it all at any time. <a href="privacy/">Read the privacy policy</a>.</p>
+  </div>
+</section>
+
+<section class="centred">
+  <div class="wrap">
+    <img class="soon-icon" src="assets/icon.png" alt="" loading="lazy">
+    <h2>Coming soon to the App Store.</h2>
+    <p class="intro">Ubi Fui is nearly ready. Questions or ideas? <a href="support/">Get in touch</a>.</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Colin Burn-Murdoch</span>
+    <nav>
+      <a href="support/">Support</a>
+      <a href="privacy/">Privacy Policy</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
